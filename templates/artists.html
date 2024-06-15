@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artists</title>
+    <style>
+        .artist-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .artist-card {
+            flex-basis: calc(20% - 10px);
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .artist-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="artist-row">
+        {{range .Artists}}
+        <div class="artist-card" onclick="location.href='/artist/{{.ID}}'">
+            <img src="{{.Image}}" alt="{{.Name}}">
+            <h2>{{.Name}}</h2>
+            <p>First Album: {{.FirstAlbum}}</p>
+            <p>Started: {{.CreationDate}}</p>
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>

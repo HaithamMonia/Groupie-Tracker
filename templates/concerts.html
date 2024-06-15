@@ -1,0 +1,24 @@
+<!-- templates/concerts.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Concerts</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Concerts</h1>
+    <h2>Locations</h2>
+    <ul>
+        {{range .Locations}}
+        <li>{{.Venue}}, {{.City}}</li>
+        {{end}}
+    </ul>
+    <h2>Dates</h2>
+    <ul>
+        {{range .Dates}}
+        <li>{{.Date}} - {{.Type}}</li>
+        {{end}}
+    </ul>
+</body>
+</html>
