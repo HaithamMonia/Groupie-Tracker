@@ -48,6 +48,9 @@ type HomePageVars struct {
 }
 
 func main() {
+	// Serve static files
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/artist/", ArtistHandler)
 
@@ -136,6 +139,11 @@ func fetchArtistDetails(id int) (Artist, ConcertDetails, error) {
 	err = json.NewDecoder(resp.Body).Decode(&dates)
 	if err != nil {
 		return Artist{}, ConcertDetails{}, err
+	}
+
+	// Remove asterisks from dates
+	for i, date := range dates.Dates {
+		dates.Dates[i] = strings.TrimPrefix(date, "*")
 	}
 
 	concertDetails := ConcertDetails{

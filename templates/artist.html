@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
     <title>{{.Artist.Name}}</title>
 </head>
 <body>
@@ -10,10 +11,7 @@
     <img src="{{.Artist.Image}}" alt="{{.Artist.Name}}">
     <p>First Album: {{.Artist.FirstAlbum}}</p>
     <p>Started: {{.Artist.CreationDate}}</p>
-    <p>Members:</p>
-    {{range .Artist.Members}}
-    <p>{{.}}</p>
-    {{end}}
+   
     
     <h2>Concert Details</h2>
     {{range $index, $location := .ConcertDetails.Locations}}
