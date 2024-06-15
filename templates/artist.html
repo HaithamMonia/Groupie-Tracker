@@ -11,13 +11,19 @@
     <img src="{{.Artist.Image}}" alt="{{.Artist.Name}}">
     <p>First Album: {{.Artist.FirstAlbum}}</p>
     <p>Started: {{.Artist.CreationDate}}</p>
-   
-    
+
     <h2>Concert Details</h2>
     {{range $index, $location := .ConcertDetails.Locations}}
     <div class="concert-detail">
-      <p>Location: {{$location}}</p>
-      <p>Date: {{index $.ConcertDetails.Dates $index}}</p>
+        <p>Location: {{$location}}</p>
+        <p>Dates:</p>
+        <ul>
+            {{range $dateIndex, $date := $.ConcertDetails.Dates}}
+                {{if eq (index $.ConcertDetails.Locations $index) $location}}
+                    <li>{{$date}}</li>
+                {{end}}
+            {{end}}
+        </ul>
     </div>
     {{end}}
 </body>
