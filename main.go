@@ -12,12 +12,34 @@ import (
 
 // Artist represents the structure of an artist's data
 type Artist struct {
-	ID           int
-	Name         string
-	Image        string
-	FirstAlbum   string
-	CreationDate int
-	Members      []string
+	ID           int      `json:"id"`
+	Name         string   `json:"name"`
+	Image        string   `json:"image"`
+	FirstAlbum   string   `json:"firstAlbum"`
+	CreationDate int      `json:"creationDate"`
+	Members      []string `json:"members"`
+	LocationsURL string   `json:"locations"`
+	DatesURL     string   `json:"concertDates"`
+	RelationsURL string   `json:"relations"`
+}
+
+// Locations represents the structure of locations data
+type Locations struct {
+	ID        int      `json:"id"`
+	Locations []string `json:"locations"`
+	DatesURL  string   `json:"dates"`
+}
+
+// Dates represents the structure of dates data
+type Dates struct {
+	ID    int      `json:"id"`
+	Dates []string `json:"dates"`
+}
+
+// ConcertDetails represents the structure of concert details data
+type ConcertDetails struct {
+	Locations []string
+	Dates     []string
 }
 
 // HomePageVars contains variables to pass to the homepage template
@@ -36,79 +58,6 @@ func main() {
 	}
 }
 
-// HomeHandler handles the homepage requests and displays a list of artists
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	artists, err := fetchArtists()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	t, err := template.ParseFiles("templates/artists.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	vars := HomePageVars{Artists: artists}
-	t.Execute(w, vars)
-}
-
-// fetchArtistDetails makes an HTTP request to the API and returns an Artist struct for the given ID
-func fetchArtistDetails(id int) (Artist, error) {
-	// Construct the URL with the artist ID
-	url := fmt.Sprintf("https://groupietrackers.herokuapp.com/api/artists/%d", id)
-
-	// Make the HTTP GET request
-	resp, err := http.Get(url)
-	if err != nil {
-		return Artist{}, err
-	}
-	defer resp.Body.Close()
-
-	// Decode the JSON response into an Artist struct
-	var artist Artist
-	err = json.NewDecoder(resp.Body).Decode(&artist)
-	if err != nil {
-		return Artist{}, err
-	}
-
-	return artist, nil
-}
-
-// ArtistHandler handles requests for individual artist details
-func ArtistHandler(w http.ResponseWriter, r *http.Request) {
-	// Extracting the artist ID from the URL path
-	parts := strings.Split(r.URL.Path, "/")
-	if len(parts) < 3 {
-		http.Error(w, "Invalid URL", http.StatusBadRequest)
-		return
-	}
-	idStr := parts[2]
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "Invalid Artist ID", http.StatusBadRequest)
-		return
-	}
-
-	// Fetching artist details using the ID...
-	// Assuming fetchArtistDetails is a function you've implemented
-	artist, err := fetchArtistDetails(id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// Assuming you have an 'artist.html' template for displaying individual artist details
-	t, err := template.ParseFiles("templates/artist.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	t.Execute(w, artist)
-}
-
 // fetchArtists makes an HTTP request to the API and returns a slice of Artists
 func fetchArtists() ([]Artist, error) {
 	resp, err := http.Get("https://groupietrackers.herokuapp.com/api/artists")
@@ -124,4 +73,121 @@ func fetchArtists() ([]Artist, error) {
 	}
 
 	return artists, nil
+}
+
+// HomeHandler handles the homepage requests and displays a list of artists
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	artists, err := fetchArtists()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	t, err := template.ParseFiles("templates/artists.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	vars := HomePageVars{Artists: artists}
+	err = t.Execute(w, vars)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+// fetchArtistDetails makes an HTTP request to the API and returns an Artist struct and ConcertDetails for the given ID
+func fetchArtistDetails(id int) (Artist, ConcertDetails, error) {
+	// Fetch artist details
+	url := fmt.Sprintf("https://groupietrackers.herokuapp.com/api/artists/%d", id)
+	resp, err := http.Get(url)
+	if err != nil {
+		return Artist{}, ConcertDetails{}, err
+	}
+	defer resp.Body.Close()
+
+	var artist Artist
+	err = json.NewDecoder(resp.Body).Decode(&artist)
+	if err != nil {
+		return Artist{}, ConcertDetails{}, err
+	}
+
+	// Fetch locations details
+	resp, err = http.Get(artist.LocationsURL)
+	if err != nil {
+		return Artist{}, ConcertDetails{}, err
+	}
+	defer resp.Body.Close()
+
+	var locations Locations
+	err = json.NewDecoder(resp.Body).Decode(&locations)
+	if err != nil {
+		return Artist{}, ConcertDetails{}, err
+	}
+
+	// Fetch dates details
+	resp, err = http.Get(artist.DatesURL)
+	if err != nil {
+		return Artist{}, ConcertDetails{}, err
+	}
+	defer resp.Body.Close()
+
+	var dates Dates
+	err = json.NewDecoder(resp.Body).Decode(&dates)
+	if err != nil {
+		return Artist{}, ConcertDetails{}, err
+	}
+
+	concertDetails := ConcertDetails{
+		Locations: locations.Locations,
+		Dates:     dates.Dates,
+	}
+
+	return artist, concertDetails, nil
+}
+
+// ArtistHandler handles requests for individual artist details and their concert details
+func ArtistHandler(w http.ResponseWriter, r *http.Request) {
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 3 {
+		http.Error(w, "Invalid URL", http.StatusBadRequest)
+		return
+	}
+	idStr := parts[2]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid Artist ID", http.StatusBadRequest)
+		return
+	}
+
+	artist, concertDetails, err := fetchArtistDetails(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	t, err := template.ParseFiles("templates/artist.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create a struct to hold both artist and concert details
+	data := struct {
+		Artist         Artist
+		ConcertDetails ConcertDetails
+	}{
+		Artist:         artist,
+		ConcertDetails: concertDetails,
+	}
+
+	// Logging data for debugging
+	log.Printf("Artist: %+v\n", artist)
+	log.Printf("ConcertDetails: %+v\n", concertDetails)
+
+	// Execute the template with the combined data
+	err = t.Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

@@ -17,6 +17,8 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             text-align: center;
+            text-decoration: none; /* Remove underline from links */
+            color: inherit; /* Inherit text color from parent */
         }
         .artist-card img {
             max-width: 100%;
@@ -28,12 +30,18 @@
 <body>
     <div class="artist-row">
         {{range .Artists}}
-        <div class="artist-card" onclick="location.href='/artist/{{.ID}}'">
+        <a href="/artist/{{.ID}}" class="artist-card">
             <img src="{{.Image}}" alt="{{.Name}}">
             <h2>{{.Name}}</h2>
             <p>First Album: {{.FirstAlbum}}</p>
             <p>Started: {{.CreationDate}}</p>
-        </div>
+            <p>Members:</p>
+    
+        {{range .Members}}
+        {{.}} <br>
+        {{end}}
+    
+        </a>
         {{end}}
     </div>
 </body>

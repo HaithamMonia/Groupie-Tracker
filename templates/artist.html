@@ -3,18 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Name}}</title>
+    <title>{{.Artist.Name}}</title>
 </head>
 <body>
-    <h1>{{.Name}}</h1>
-    <img src="{{.Image}}" alt="{{.Name}}">
-    <p>First Album: {{.FirstAlbum}}</p>
-    <p>Started: {{.CreationDate}}</p>
+    <h1>{{.Artist.Name}}</h1>
+    <img src="{{.Artist.Image}}" alt="{{.Artist.Name}}">
+    <p>First Album: {{.Artist.FirstAlbum}}</p>
+    <p>Started: {{.Artist.CreationDate}}</p>
     <p>Members:</p>
-    <ul>
-        {{range .Members}}
-        <li>{{.}}</li>
-        {{end}}
-    </ul>
+    {{range .Artist.Members}}
+    <p>{{.}}</p>
+    {{end}}
+    
+    <h2>Concert Details</h2>
+    {{range $index, $location := .ConcertDetails.Locations}}
+    <div class="concert-detail">
+      <p>Location: {{$location}}</p>
+      <p>Date: {{index $.ConcertDetails.Dates $index}}</p>
+    </div>
+    {{end}}
 </body>
 </html>
