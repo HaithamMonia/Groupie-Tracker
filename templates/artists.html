@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/style.css">
     <title>Artists</title>
-    
 </head>
 <body>
+    <div class="container">
     <div class="artist-row">
         {{range .Artists}}
         <a href="/artist/{{.ID}}" class="artist-card">
@@ -16,13 +16,12 @@
             <p>First Album: {{.FirstAlbum}}</p>
             <p>Started: {{.CreationDate}}</p>
             <p>Members:</p>
-    
-        {{range .Members}}
-        {{.}} <br>
-        {{end}}
-    
+            {{range .Members}}
+            {{.}} <br>
+            {{end}}
         </a>
         {{end}}
     </div>
+</div>
 </body>
 </html>

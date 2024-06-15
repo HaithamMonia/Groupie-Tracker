@@ -23,23 +23,9 @@ type Artist struct {
 	RelationsURL string   `json:"relations"`
 }
 
-// Locations represents the structure of locations data
-type Locations struct {
-	ID        int      `json:"id"`
-	Locations []string `json:"locations"`
-	DatesURL  string   `json:"dates"`
-}
-
-// Dates represents the structure of dates data
-type Dates struct {
-	ID    int      `json:"id"`
-	Dates []string `json:"dates"`
-}
-
 // ConcertDetails represents the structure of concert details data
 type ConcertDetails struct {
-	Locations []string
-	Dates     []string
+	LocationsDates map[string][]string `json:"datesLocations"`
 }
 
 // HomePageVars contains variables to pass to the homepage template
@@ -115,43 +101,20 @@ func fetchArtistDetails(id int) (Artist, ConcertDetails, error) {
 		return Artist{}, ConcertDetails{}, err
 	}
 
-	// Fetch locations details
-	resp, err = http.Get(artist.LocationsURL)
+	// Fetch relation details
+	resp, err = http.Get(artist.RelationsURL)
 	if err != nil {
 		return Artist{}, ConcertDetails{}, err
 	}
 	defer resp.Body.Close()
 
-	var locations Locations
-	err = json.NewDecoder(resp.Body).Decode(&locations)
+	var relations ConcertDetails
+	err = json.NewDecoder(resp.Body).Decode(&relations)
 	if err != nil {
 		return Artist{}, ConcertDetails{}, err
 	}
 
-	// Fetch dates details
-	resp, err = http.Get(artist.DatesURL)
-	if err != nil {
-		return Artist{}, ConcertDetails{}, err
-	}
-	defer resp.Body.Close()
-
-	var dates Dates
-	err = json.NewDecoder(resp.Body).Decode(&dates)
-	if err != nil {
-		return Artist{}, ConcertDetails{}, err
-	}
-
-	// Remove asterisks from dates
-	for i, date := range dates.Dates {
-		dates.Dates[i] = strings.TrimPrefix(date, "*")
-	}
-
-	concertDetails := ConcertDetails{
-		Locations: locations.Locations,
-		Dates:     dates.Dates,
-	}
-
-	return artist, concertDetails, nil
+	return artist, relations, nil
 }
 
 // ArtistHandler handles requests for individual artist details and their concert details
@@ -190,8 +153,7 @@ func ArtistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Logging data for debugging
-	log.Printf("Artist: %+v\n", artist)
-	log.Printf("ConcertDetails: %+v\n", concertDetails)
+
 
 	// Execute the template with the combined data
 	err = t.Execute(w, data)

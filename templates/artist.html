@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="/static/style.css">
     <title>{{.Artist.Name}}</title>
 </head>
 <body>
@@ -13,15 +13,13 @@
     <p>Started: {{.Artist.CreationDate}}</p>
 
     <h2>Concert Details</h2>
-    {{range $index, $location := .ConcertDetails.Locations}}
+    {{range $location, $dates := .ConcertDetails.LocationsDates}}
     <div class="concert-detail">
         <p>Location: {{$location}}</p>
         <p>Dates:</p>
         <ul>
-            {{range $dateIndex, $date := $.ConcertDetails.Dates}}
-                {{if eq (index $.ConcertDetails.Locations $index) $location}}
-                    <li>{{$date}}</li>
-                {{end}}
+            {{range $dates}}
+            <li>{{.}}</li>
             {{end}}
         </ul>
     </div>
