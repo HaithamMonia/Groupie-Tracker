@@ -7,7 +7,8 @@
     <title>Artists</title>
 </head>
 <body>
-    <div class="container">
+    <div class="artistsT"><h1>Artists</h1></div>
+
     <div class="artist-row">
         {{range .Artists}}
         <a href="/artist/{{.ID}}" class="artist-card">
@@ -22,6 +23,5 @@
         </a>
         {{end}}
     </div>
-</div>
 </body>
 </html>

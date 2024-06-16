@@ -7,16 +7,17 @@
     <title>{{.Artist.Name}}</title>
 </head>
 <body>
-    <h1>{{.Artist.Name}}</h1>
-    <img src="{{.Artist.Image}}" alt="{{.Artist.Name}}">
-    <p>First Album: {{.Artist.FirstAlbum}}</p>
-    <p>Started: {{.Artist.CreationDate}}</p>
+    <div class="detailsContainer">
+      <div class="detailHead">
+    <h1>{{.Artist.Name}} Concert Details</h1>
+    <img class="imgDetail" src="{{.Artist.Image}}" alt="{{.Artist.Name}}">
+</div>
 
-    <h2>Concert Details</h2>
+
     {{range $location, $dates := .ConcertDetails.LocationsDates}}
     <div class="concert-detail">
-        <p>Location: {{$location}}</p>
-        <p>Dates:</p>
+        <p>{{$location}}</p>
+        <p>On:</p>
         <ul>
             {{range $dates}}
             <li>{{.}}</li>
@@ -24,5 +25,6 @@
         </ul>
     </div>
     {{end}}
+</div>
 </body>
 </html>

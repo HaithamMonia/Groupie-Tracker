@@ -40,7 +40,7 @@ func main() {
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/artist/", ArtistHandler)
 
-	log.Println("Listening on :8080...")
+	log.Println("Listening on : http://localhost:8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal(err)
